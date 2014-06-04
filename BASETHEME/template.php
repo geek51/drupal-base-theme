@@ -23,52 +23,11 @@ if (theme_get_setting('BASETHEME_rebuild_registry') && !defined('MAINTENANCE_MOD
   drupal_theme_rebuild();
 }
 
-
+/**
+*FUnction to add js,css or custom vars
+**/
 function BASETHEME_preprocess_page(&$variables) {
-    //add global menu style
-    $vocabulary = taxonomy_vocabulary_machine_name_load('categoria');
-    $terms = entity_load('taxonomy_term', FALSE, array('vid' => $vocabulary->vid));
-    
-    $str_css = '';
-    foreach ($terms as $term) {
-        $name = preg_replace('/[^a-z]+/', '', strtolower($term->name));
-        $str_css .= '.' . $name . ':hover > a';
-        $str_css .= '{color: white;background-color:' . BASETHEME_get_field_value($term->field_color) . "} ";
-        $str_css .= '.' . $name . ' .menu{background-color: '.BASETHEME_get_field_value($term->field_color_secundario).'} ';
-    }
-    
-    drupal_add_css($str_css, array('type' => 'inline'));
-    
-    //add mobile detection vars to be available to js
-    if( isset($variables['is_tablet']) && isset($variables['is_mobile']) ){
-        drupal_add_js(
-            array(
-                'responsive' => array(                    
-                        'isTablet' => $variables['is_tablet'],
-                        'isMobile' => $variables['is_mobile'],
-                        'isDesktop' => !$variables['is_tablet'] && !$variables['is_mobile']
-                )
-            ), 
-            'setting'
-        );
-    } 
-    
-    if ($variables['is_front']) {        
-        drupal_add_js($GLOBALS['theme_path'] . '/js/vendor/swipe.min.js', array('type' => 'file') );
-        drupal_add_js($GLOBALS['theme_path'] . '/js/front.js', array('type' => 'file') );
-        return;
-    }
-    
-    if( isset($variables['node']) ){
-        switch ($variables['node']->type){
-            case 'productos':
-                drupal_add_js($GLOBALS['theme_path'] . '/js/vendor/jquery.colorbox-min.js', array('type' => 'file') );
-                drupal_add_js($GLOBALS['theme_path'] . '/js/products.js', array('type' => 'file') );
-                
-                drupal_add_css($GLOBALS['theme_path'] . '/css/colorbox.css');
-                break;
-        }
-    }   
+   
 }
 
 /**
@@ -118,13 +77,13 @@ function BASETHEME_get_field_multiple($field){
     return $field;
 }
 
-function get_group_item($group_field){
+function BASETHEME_get_group_item($group_field){
     return array_pop( 
         entity_load( 'field_collection_item', array($group_field['value']) ) 
     );
 }
 
-function get_multi_group_item($group_field){
+function BASETHEME_get_multi_group_item($group_field){
     $items = array();
     
     for($i=0, $total = count($group_field); $i < $total; $i++){
@@ -138,6 +97,8 @@ function BASETHEME_get_taxonomy_name($field_taxonomy) {
     return $field_taxonomy[0]['taxonomy_term']->name;
 }
 
+//OPTIONA BUT USEFUL HOOKS
+/*
 function BASETHEME_menu_link(array $variables) {
   $element = $variables['element'];
   $sub_menu = '';
@@ -166,16 +127,6 @@ function BASETHEME_menu_link(array $variables) {
 }
 
 function BASETHEME_preprocess_views_view(&$variables) {    
-    $view = $variables['view'];
-    switch($view->name){
-        case 'puntos_de_venta':
-            $detect = mobile_detect_get_object();
-            $is_Tablet = $detect->isTablet();
-            $is_Mobile = $detect->isMobile();
-            
-            if($is_Tablet || (!$is_Mobile && !$is_Tablet)){
-                drupal_add_js($GLOBALS['base_path']  .  $GLOBALS['theme_path'] . '/js/stores.js');            
-            }
-            break;        
-    }
+
 }
+*/
